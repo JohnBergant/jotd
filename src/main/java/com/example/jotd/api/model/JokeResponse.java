@@ -2,6 +2,9 @@ package com.example.jotd.api.model;
 
 import lombok.Data;
 
+/**
+ * Joke response for the api
+ */
 @Data
 public class JokeResponse {
 

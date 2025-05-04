@@ -11,6 +11,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filter that checks for the presence of an X-API-KEY and authentications the request
+ */
 @AllArgsConstructor
 public class ApiKeyFilter extends OncePerRequestFilter {
 

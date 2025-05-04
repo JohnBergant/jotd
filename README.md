@@ -68,7 +68,7 @@ For MongoDB Atlas:
 Start the application using Gradle:
 
 ```bash
-./gradlew bootRun
+./gradlew bootRun --args='--spring.profiles.active=dev'
 ```
 
 The application will be available at `http://localhost:8080`.

@@ -24,8 +24,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JokeServiceImpl implements JokeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(JokeServiceImpl.class);
-
     private final JokeRepository jokeRepository;
 
     private final JokeTransformer jokeTransformer;

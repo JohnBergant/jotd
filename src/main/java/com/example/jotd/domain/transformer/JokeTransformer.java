@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
+/**
+ * Transformer for the business logic layer
+ */
 @Service
 public class JokeTransformer {
 

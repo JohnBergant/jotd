@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Authentication manager for API keys.
+ */
 @Service
 public class ApiKeyAuthenticationManager implements AuthenticationManager {
 

@@ -5,6 +5,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationConverter;
 import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
+/**
+ * Authentication converter for API authentication.
+ */
 public class ApiAuthenticationConverter implements AuthenticationConverter {
     private final static String API_KEY_HEADER_NAME = "X-API-KEY";
 
