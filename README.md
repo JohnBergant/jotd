@@ -1,12 +1,10 @@
 # Joke of the Day (JOTD) Service
 
-A Spring Boot application that serves jokes, including a daily featured jokeDocument. This service provides a RESTful API for creating, retrieving, updating, and deleting jokes, with special endpoints for random jokes and the jokeDocument of the day.
+A Spring Boot application that serves jokes, including a daily featured joke. This service provides a RESTful API for creating, retrieving, updating, and deleting jokes, with special endpoints for random jokes and the joke of the day.
 
 ## Features
 
-- 🌞 **Joke of the Day**: Automatically selects and caches a daily jokeDocument
-- 🎲 **Random Jokes**: Retrieve random jokes from the entire collection or by category
-- 🔍 **Category Filtering**: Find jokes by specific categories
+- 🌞 **Joke of the Day**: Automatically selects and caches a daily joke
 - 🔒 **Secured Endpoints**: Authentication for content management
 - 📝 **Full CRUD Operations**: Create, read, update, and delete jokes
 - 📊 **Actuator Endpoints**: Monitor application health and metrics
@@ -127,11 +125,27 @@ To secure production deployments:
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
+### Decisions on architecture
+
+#### Java framework
+
+Opting to go with Spring Boot as it is a well-known product with a vast amount of documentation to help with bootstrapping a new service.
+It offers robust libraries for interfacing with different storage and a strong security suite. It also offers a great set of tooling for 
+making a service production ready through the actuator libraries from health checks to monitoring service vitals.
+
+### Datastore
+
+Opting to go with MongoDB for the datastore. The date will be used as the key for the document.
+Joke and description will be part of the document. Initially we won't support searching on anything other than the date.
+The daily nature of the records aligns well with the key based lookup and having a document store enables flexibility for adding new features to the joke.
+Also I've wanted to explore MongoDB for a while and this seemed like a decent opportunity to work with the DB and expand my knowledge.
+
 ### Running tests
 
 ```bash
 ./gradlew test
 ```
+
 ### API Tests
 
 [http tests](http/controller-tests.http)
