@@ -14,10 +14,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Optional;
-import java.util.Random;
 
 /**
  * Implementation of the JokeService interface.
@@ -32,23 +32,7 @@ public class JokeServiceImpl implements JokeService {
 
     private final JokeTransformer jokeTransformer;
     
-    // Cache key for the joke of the day
     private static final String JOKE_OF_THE_DAY_CACHE = "jokeOfTheDay";
-    
-    // For determining the "joke of the day" if we don't have access to persistence
-    private static final Random random = new Random();
-
-    @Override
-    public List<Joke> findAll() {
-        List<JokeDocument> jokeDocuments = jokeRepository.findAll();
-        List<Joke> jokes = new ArrayList<>();
-
-        for (JokeDocument jokeDocument : jokeDocuments) {
-            jokes.add(jokeTransformer.of(jokeDocument));
-        }
-
-        return jokes;
-    }
 
     @Override
     public Optional<Joke> findById(String jokeId) {
@@ -57,11 +41,19 @@ public class JokeServiceImpl implements JokeService {
         return jokeDocument.map(jokeTransformer::of);
     }
 
-
     @Override
     @Cacheable(value = JOKE_OF_THE_DAY_CACHE)
-    public Joke getJokeOfTheDay(String jokeId) {
-        return null;
+    public Joke getJokeOfTheDay() {
+        ZonedDateTime utcNow = ZonedDateTime.now(ZoneId.of("UTC"));
+        LocalDateTime localDateTimeFromZoned = utcNow.toLocalDateTime();
+        final String jokeKey = jokeTransformer.getJokeKey(localDateTimeFromZoned);
+
+        Optional<JokeDocument> optionalJokeDocument = jokeRepository.findById(jokeKey);
+
+        if (optionalJokeDocument.isEmpty()) {
+            throw new JokeNotFound(jokeKey);
+        }
+        return jokeTransformer.of(optionalJokeDocument.get());
     }
 
     @Override
@@ -85,8 +77,6 @@ public class JokeServiceImpl implements JokeService {
 
     @Override
     public Joke saveJoke(Joke joke) {
-        logger.debug("Saving joke: {}", joke);
-        // validate joke
         JokeDocument jokeDocument = jokeTransformer.to(joke);
         jokeDocument = jokeRepository.save(jokeDocument);
 

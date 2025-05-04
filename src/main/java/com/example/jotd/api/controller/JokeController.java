@@ -21,15 +21,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 /**
  * REST controller for handling joke-related requests.
  */
 @RestController
-@RequestMapping("/api/jokes")
-@Tag(name = "Jokes", description = "Endpoints for managing jokes")
+@RequestMapping("/v1/jokes")
+@Tag(name = "Jokes", description = "Endpoints for performing CRUD operations on jokes")
 @Validated
 @RequiredArgsConstructor
 @Slf4j
@@ -37,28 +36,13 @@ public class JokeController {
 
     private final JokeService jokeService;
 
-    @GetMapping
-    @Operation(summary = "Get all jokes", description = "Retrieves a list of all jokes in the system")
-    @ApiResponses({
-        @ApiResponse(responseCode = "200", description = "Successfully retrieved the list of jokes"),
-        @ApiResponse(responseCode = "204", description = "No jokes found")
-    })
-    public ResponseEntity<List<Joke>> getAllJokes() {
-        List<Joke> jokes = jokeService.findAll();
-        if (jokes.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.ok(jokes);
-    }
-
     @GetMapping("/daily")
     @Operation(summary = "Get joke of the day", description = "Retrieves the current joke of the day")
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved the joke of the day")
     })
     public ResponseEntity<Joke> getJokeOfTheDay() {
-        //todo send the day from the request
-        return ResponseEntity.ok(jokeService.getJokeOfTheDay("abc"));
+        return ResponseEntity.ok(jokeService.getJokeOfTheDay());
     }
 
     @PostMapping
