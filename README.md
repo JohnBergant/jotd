@@ -158,6 +158,13 @@ API - All the controllers and request/response DTOs
 Domain - Business Logic
 Infrastructure - Interface with the datastore
 
+## Todos
+- [ ] Set up better security (hmac, signed bearer jwt)
+- [ ] Retention policy for Mongo DB documents
+- [ ] Configure the actuator endpoints for production
+   - [ ] Set up a liveness and readiness check for health
+   - [ ] Add Spring Prometheus package for metric retrieval
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
