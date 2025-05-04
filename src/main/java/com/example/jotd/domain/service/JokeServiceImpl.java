@@ -1,5 +1,6 @@
 package com.example.jotd.domain.service;
 
+import com.example.jotd.api.errors.JokeInvalidException;
 import com.example.jotd.api.errors.JokeNotFound;
 import com.example.jotd.api.model.Joke;
 import com.example.jotd.api.model.JokeResponse;
@@ -43,6 +44,18 @@ public class JokeServiceImpl implements JokeService {
             throw new JokeNotFound(jokeKey);
         }
         return jokeTransformer.of(optionalJokeDocument.get());
+    }
+
+    @Override
+    public JokeResponse getJokeById(String id) {
+        if (id == null || id.length() > 10) {
+            throw new JokeInvalidException("jokeId");
+        }
+        Optional<JokeDocument> jokeDocument = jokeRepository.findById(id);
+        if (jokeDocument.isPresent()) {
+            return jokeTransformer.of(jokeDocument.get());
+        }
+        throw new JokeNotFound(id);
     }
 
     @Override

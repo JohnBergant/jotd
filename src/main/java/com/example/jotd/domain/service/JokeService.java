@@ -16,6 +16,13 @@ public interface JokeService {
     JokeResponse getJokeOfTheDay();
 
     /**
+     * Return a joke by its ID.
+     * @param id the id of the joke.
+     * @return the joke if found
+     */
+    JokeResponse getJokeById(String id);
+
+    /**
      * Update a joke
      *
      * @param jokeId the id of the joke to update

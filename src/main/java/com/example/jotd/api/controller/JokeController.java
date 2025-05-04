@@ -48,6 +48,18 @@ public class JokeController {
         return ResponseEntity.ok(jokeService.getJokeOfTheDay());
     }
 
+    @GetMapping("/{id}")
+    @Operation(summary = "Get a joke by the id", description = "Retrieves a joke by id for testing")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved the joke of the day")
+    })
+    public ResponseEntity<JokeResponse> getJokeById(
+            @Parameter(description = "ID of the joke to retrieve", required = true)
+            @PathVariable @NotBlank String id
+    ) {
+        return ResponseEntity.ok(jokeService.getJokeById(id));
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Create a new joke", description = "Creates a new joke in the system")
@@ -130,7 +142,7 @@ public class JokeController {
     @ExceptionHandler(JokeInvalidException.class)
     public ResponseEntity<ApiError> handleJokeNotFound(JokeInvalidException ex, HttpServletRequest request) {
         ApiError error = ApiError.fromException(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     /**
