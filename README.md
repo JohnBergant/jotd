@@ -75,9 +75,11 @@ The application will be available at `http://localhost:8080`.
 
 ### Default Credentials
 
-The default credentials (configured in `application.properties`):
-- Username: `admin`
-- Password: `admin`
+To make elevated API Requests and API Key is needed. A default one is setup in the properties file.
+
+**Note**: This should only be used for development purposes
+Before going to production this should be replaced with an authentication method that does not expose the secret.
+HMAC signing would be a good option or Bearer auth using signed JWTs.
 
 **Note**: These should be changed in production environments.
 
@@ -93,10 +95,7 @@ http://localhost:8080/swagger-ui.html
 
 | Method | Endpoint                       | Description                         | Access          |
 |--------|--------------------------------|-------------------------------------|-----------------|
-| GET    | /api/jokes                     | Get all jokes                       | Authenticated   |
 | GET    | /api/jokes/{id}                | Get jokeDocument by ID                      | Authenticated   |
-| GET    | /api/jokes/category/{category} | Get jokes by category               | Authenticated   |
-| GET    | /api/jokes/random              | Get a random jokeDocument                   | Public          |
 | GET    | /api/jokes/daily               | Get jokeDocument of the day                 | Public          |
 | POST   | /api/jokes                     | Create a new jokeDocument                   | Authenticated   |
 | PUT    | /api/jokes/{id}                | Update a jokeDocument                       | Authenticated   |
@@ -104,15 +103,13 @@ http://localhost:8080/swagger-ui.html
 
 ## Security
 
-The application uses Spring Security with HTTP Basic Authentication. Two levels of access are provided:
+The application uses Spring Security with API Key based Authentication. Two levels of access are provided:
 
 1. **Public Access**:
-   - Random jokes
    - Joke of the day
 
 2. **Authenticated Access**:
    - All CRUD operations on jokes
-   - Actuator endpoints (for admins only)
 
 To secure production deployments:
 - Change default credentials
@@ -121,11 +118,6 @@ To secure production deployments:
 - Restrict CORS settings to trusted domains
 
 ## Development Guidelines
-
-### Adding a new jokeDocument category
-
-1. No schema changes are needed - categories are flexible
-2. Simply include a new category string when creating jokes
 
 ### Implementing new features
 
@@ -140,67 +132,17 @@ To secure production deployments:
 ```bash
 ./gradlew test
 ```
+### API Tests
 
-## API Usage Examples
+[http tests](http/controller-tests.http)
 
-### Get the jokeDocument of the day
-
-```bash
-curl http://localhost:8080/api/jokes/daily
-```
-
-### Get a random jokeDocument
-
-```bash
-curl http://localhost:8080/api/jokes/random
-```
-
-### Get a random jokeDocument from a specific category
-
-```bash
-curl http://localhost:8080/api/jokes/random?category=Programming
-```
-
-### Create a new jokeDocument (authenticated)
-
-```bash
-curl -X POST http://localhost:8080/api/jokes \
-  -u admin:admin \
-  -H "Content-Type: application/json" \
-  -d '{
-    "content": "Why did the programmer quit his job? Because he did not get arrays.",
-    "author": "Developer Humor",
-    "category": "Programming"
-  }'
-```
-
-### Get all jokes (authenticated)
-
-```bash
-curl -u admin:admin http://localhost:8080/api/jokes
-```
+These can be ran in Intellij or by downloading the Intellij Http Client [here](https://www.jetbrains.com/help/idea/http-client-cli.html).
 
 ## Project Structure
 
-```
-jotd/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/
-│   │   │       └── example/
-│   │   │           └── jotd/
-│   │   │               ├── config/         # Configuration classes
-│   │   │               ├── controller/     # REST controllers
-│   │   │               ├── model/          # Domain models
-│   │   │               ├── repository/     # MongoDB repositories
-│   │   │               └── service/        # Business logic
-│   │   └── resources/
-│   │       └── application.properties      # Application configuration
-│   └── test/                               # Unit and integration tests
-├── build.gradle                            # Gradle build file
-└── README.md                               # Project documentation
-```
+API - All the controllers and request/response DTOs
+Domain - Business Logic
+Infrastructure - Interface with the datastore
 
 ## License
 

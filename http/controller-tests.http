@@ -1,0 +1,238 @@
+### Create a bad joke
+POST {{host}}/v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "AFAFAFAF",
+  "description": "{{apiKey}}",
+  "joke": "abc"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400 BAD REQUEST");
+    });
+%}
+
+### Create a joke with no description
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-05T10:00:00",
+  "description": "",
+  "joke": "abc"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 CREATED");
+    });
+%}
+
+### Create no joke, no joke
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-05T10:00:00",
+  "description": "afafafaf",
+  "joke": ""
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 400, "Response status is not 400 BAD REQUEST");
+    });
+%}
+
+### Create a joke
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-05T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "I like UDP jokes, because I don't care if you get it. I like TCP jokes, because I can tell them until you get it."
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 200 OK");
+    });
+
+    client.global.set("jokeId", response.body.jokeId);
+    client.global.set("firstJoke", response.body.joke);
+%}
+
+### Get a joke
+GET {{host}}v1/jokes/{{jokeId}}
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200 OK");
+    });
+%}
+
+### Get a joke
+GET {{host}}v1/jokes/{{jokeId}}
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 403, "Response status is not 403 FORBIDDEN");
+    });
+%}
+
+### Update created joke
+PUT {{host}}v1/jokes/{{jokeId}}
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-05T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "There are 10 types of people in this world: those who know hex and F the rest"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200 OK");
+    });
+
+    client.test("Make sure jokes are not the same value", function() {
+        client.assert(response.body.joke !== client.global.get("firstJoke"), "Jokes are the same value")
+    })
+
+    client.global.set("jokeId", response.body.jokeId);
+%}
+
+### Delete the created Joke
+DELETE {{host}}v1/jokes/{{jokeId}}
+X-API-KEY: {{apiKey}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204 NO CONTENT");
+    });
+%}
+
+### Delete the deleted Joke
+DELETE {{host}}v1/jokes/{{jokeId}}
+X-API-KEY: {{apiKey}}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 204, "Response status is not 204 NO CONTENT");
+    });
+%}
+
+### Get the deleted joke
+GET {{host}}v1/jokes/{{jokeId}}
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 404, "Response status is not 404 NOT FOUND");
+    });
+%}
+
+### Create a joke May 5th
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-05T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "Why was the statement scared while the comment was not? Statements are executed."
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 CREATED");
+    });
+
+    client.global.set("jokeId", response.body.jokeId);
+    client.global.set("firstJoke", response.body.joke);
+%}
+
+
+### Create a joke May 6th
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-06T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "Interviewer: Your resume says you take things too literally. Me: When the hell did my resume learn to talk?"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 CREATED");
+    });
+
+    client.global.set("jokeId", response.body.jokeId);
+    client.global.set("firstJoke", response.body.joke);
+%}
+
+
+### Create a joke May 7th
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-07T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "abc"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 CREATED");
+    });
+
+    client.global.set("jokeId", response.body.jokeId);
+    client.global.set("firstJoke", response.body.joke);
+%}
+
+
+### Create a joke May 8th
+POST {{host}}v1/jokes
+X-API-KEY: {{apiKey}}
+Content-Type: application/json
+
+{
+  "date": "2025-05-08T10:00:00",
+  "description": "{{apiKey}}",
+  "joke": "abc"
+}
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 201, "Response status is not 201 CREATED");
+    });
+
+    client.global.set("jokeId", response.body.jokeId);
+    client.global.set("firstJoke", response.body.joke);
+%}
+
+### Get daily joke
+GET {{host}}v1/jokes/daily
+Content-Type: application/json
+
+> {%
+    client.test("Request executed successfully", function() {
+        client.assert(response.status === 200, "Response status is not 200 OK");
+    });
+%}

@@ -1,11 +1,13 @@
 package com.example.jotd.domain.service;
 
+import com.example.jotd.api.errors.JokeInvalidException;
 import com.example.jotd.api.errors.JokeNotFound;
 import com.example.jotd.api.model.Joke;
 import com.example.jotd.api.model.JokeResponse;
 import com.example.jotd.domain.transformer.JokeTransformer;
 import com.example.jotd.infrastructure.repository.JokeRepository;
 import com.example.jotd.infrastructure.repository.model.JokeDocument;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,14 +103,14 @@ public class JokeServiceImplTests {
         // Given
         JokeDocument updatedJokeDocument = new JokeDocument();
         updatedJokeDocument.setId(TEST_JOKE_ID);
-        updatedJokeDocument.setContent("Updated content");
+        updatedJokeDocument.setContent("Why do programmers always mix up Halloween and Christmas? Because Oct 31 equals Dec 25.");
         updatedJokeDocument.setDescription("Updated description");
         updatedJokeDocument.setCreatedAt(LocalDateTime.now());
 
         JokeResponse updatedJokeResponse = new JokeResponse();
         updatedJokeResponse.setJokeId(TEST_JOKE_ID);
-        updatedJokeResponse.setJoke("Updated content");
         updatedJokeResponse.setDescription("Updated description");
+        updatedJokeResponse.setJoke("Why do programmers always mix up Halloween and Christmas? Because Oct 31 equals Dec 25.");
 
         when(jokeRepository.findById(TEST_JOKE_ID)).thenReturn(Optional.of(jokeDocument));
         when(jokeTransformer.to(joke)).thenReturn(updatedJokeDocument);
@@ -184,5 +186,45 @@ public class JokeServiceImplTests {
 
         // Then
         verify(jokeRepository, never()).deleteById(TEST_JOKE_ID);
+    }
+
+    @Test
+    void givenAnInvalidJokeId_whenGetJokeIsInvoked_thenExceptionIsThrown() {
+        // Given
+        String jokeId1 = "afafafafafafafafafafafa";
+        String jokeId2 = null;
+
+        // When + Then
+        Assertions.assertThrows(JokeInvalidException.class, () -> jokeServiceImpl.getJokeById(jokeId1));
+        Assertions.assertThrows(JokeInvalidException.class, () -> jokeServiceImpl.getJokeById(jokeId2));
+    }
+
+    @Test
+    void givenAnValidJokeIdThatIsNotPresent_whenGetJokeIsInvoked_thenJokeNotFoundIsThrown() {
+        // Given
+        String jokeId = "25-2026";
+        when(jokeRepository.findById(jokeId)).thenReturn(Optional.empty());
+
+        // When + Then
+        Assertions.assertThrows(JokeNotFound.class, () -> jokeServiceImpl.getJokeById(jokeId));
+    }
+
+    @Test
+    void givenAnValidJokeIdThatIsPresent_whenGetJokeIsInvoked_thenJokeResponseIsReturned() {
+        // Given
+        String jokeId = "25-2026";
+
+        when(jokeRepository.findById(jokeId)).thenReturn(Optional.of(jokeDocument));
+        when(jokeTransformer.of(jokeDocument)).thenReturn(jokeResponse);
+
+        // When + Then
+        JokeResponse result = jokeServiceImpl.getJokeById(jokeId);
+
+        assertNotNull(result);
+        assertEquals(jokeResponse.getJokeId(), result.getJokeId ());
+        assertEquals(jokeResponse.getJoke(), result.getJoke());
+        assertEquals(jokeResponse.getDescription(), result.getDescription());
+
+        verify(jokeTransformer).of(jokeDocument);
     }
 }
