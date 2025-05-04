@@ -164,6 +164,12 @@ Infrastructure - Interface with the datastore
 - [ ] Configure the actuator endpoints for production
    - [ ] Set up a liveness and readiness check for health
    - [ ] Add Spring Prometheus package for metric retrieval
+- [ ] Add build process
+   - [ ] Run UTs as part of the build.
+   - [ ] Build image and run Controller tests as part of Pull Requests
+   - [ ] On Merges scan and push a signed image to an artifact repository that is tagged based on the commit sha
+
+      
 
 ## License
 
