@@ -1,5 +1,6 @@
 package com.example.jotd.api.controller;
 
+import com.example.jotd.api.errors.JokeInvalidException;
 import com.example.jotd.api.errors.JokeNotFound;
 import com.example.jotd.api.errors.JokeTimeInvalid;
 import com.example.jotd.api.model.Joke;
@@ -57,7 +58,7 @@ public class JokeController {
     })
     public ResponseEntity<JokeResponse> createJoke(
             @Parameter(description = "Joke object to be created", required = true)
-            @Valid @RequestBody Joke joke) {
+            @RequestBody Joke joke) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(jokeService.saveJoke(joke));
     }
@@ -97,7 +98,7 @@ public class JokeController {
     }
 
     /**
-     * Exception handler for JokeNotFoundException.
+     * Exception handler for JokeNotFoundException
      */
     @ExceptionHandler(JokeTimeInvalid.class)
     public ResponseEntity<ApiError> handleInvalidJokeTime(JokeTimeInvalid ex, HttpServletRequest request) {
@@ -106,7 +107,7 @@ public class JokeController {
     }
 
     /**
-     * Exception handler for DateTimeParseException.
+     * Exception handler for DateTimeParseException
      */
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ApiError> handleDateTimeParseException(HttpMessageNotReadableException ex, HttpServletRequest request) {
@@ -115,7 +116,7 @@ public class JokeController {
     }
 
     /**
-     * Exception handler for JokeNotFoundException.
+     * Exception handler for JokeNotFoundException
      */
     @ExceptionHandler(JokeNotFound.class)
     public ResponseEntity<ApiError> handleJokeNotFound(JokeNotFound ex, HttpServletRequest request) {
@@ -124,7 +125,16 @@ public class JokeController {
     }
 
     /**
-     * Exception handler for other exceptions.
+     * Exception handler for JokeInvalidException
+     */
+    @ExceptionHandler(JokeInvalidException.class)
+    public ResponseEntity<ApiError> handleJokeNotFound(JokeInvalidException ex, HttpServletRequest request) {
+        ApiError error = ApiError.fromException(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
+    }
+
+    /**
+     * Exception handler for other exceptions
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneralException(Exception ex, HttpServletRequest request) {

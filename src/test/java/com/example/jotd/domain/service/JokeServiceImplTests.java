@@ -21,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -174,13 +175,14 @@ public class JokeServiceImplTests {
     }
 
     @Test
-    void givenAnInvalidJokeId_whenDeleteJokeIsInvoked_thenJokeNotFoundExceptionIsThrown() {
+    void givenAnInvalidJokeId_whenDeleteJokeIsInvoked_thenJokeRepositoryIsNotCalled() {
         // Given
         when(jokeRepository.existsById(TEST_JOKE_ID)).thenReturn(false);
 
-        // When & Then
-        assertThrows(JokeNotFound.class, () -> {
-            jokeServiceImpl.deleteJoke(TEST_JOKE_ID);
-        });
+        // When
+        jokeServiceImpl.deleteJoke(TEST_JOKE_ID);
+
+        // Then
+        verify(jokeRepository, never()).deleteById(TEST_JOKE_ID);
     }
 }

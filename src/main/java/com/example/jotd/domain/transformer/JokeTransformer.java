@@ -1,5 +1,6 @@
 package com.example.jotd.domain.transformer;
 
+import com.example.jotd.api.errors.JokeInvalidException;
 import com.example.jotd.api.model.Joke;
 import com.example.jotd.api.model.JokeResponse;
 import com.example.jotd.infrastructure.repository.model.JokeDocument;
@@ -20,6 +21,18 @@ public class JokeTransformer {
     }
 
     public JokeDocument to(Joke joke) {
+        if (joke.getJoke() == null || joke.getJoke().isBlank() ) {
+            throw new JokeInvalidException("joke");
+        }
+
+        if (joke.getJoke().length() > 1000 ) {
+            throw new JokeInvalidException("joke");
+        }
+
+        if (joke.getDescription() != null && joke.getDescription().length() > 1000) {
+            throw new JokeInvalidException("description");
+        }
+
         JokeDocument jokeDocument = new JokeDocument();
 
         final String documentKey = getJokeKey(joke.getDate());

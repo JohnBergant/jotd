@@ -74,12 +74,9 @@ public class JokeServiceImpl implements JokeService {
 
     @Override
     public void deleteJoke(String id) {
-        logger.debug("Deleting joke with id: {}", id);
-        if (!jokeRepository.existsById(id)) {
-            logger.error("Failed to delete joke, id not found: {}", id);
-            throw new JokeNotFound(id);
+        if (jokeRepository.existsById(id)) {
+            jokeRepository.deleteById(id);
         }
-        jokeRepository.deleteById(id);
     }
 }
 
