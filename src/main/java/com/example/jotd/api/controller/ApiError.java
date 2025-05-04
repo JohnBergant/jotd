@@ -25,19 +25,16 @@ public class ApiError {
     private LocalDateTime timestamp = LocalDateTime.now();
     
     private String message;
-    
-    private String debugMessage;
-    
+
     private String path;
     
     /**
      * Create an API error from an exception
      */
-    public static ApiError fromException(HttpStatus status, Exception ex, String path) {
+    public static ApiError fromException(HttpStatus status, String message, String path) {
         return ApiError.builder()
                 .status(status)
-                .message(ex.getMessage())
-                .debugMessage(ex.getClass().getName())
+                .message(message)
                 .path(path)
                 .build();
     }

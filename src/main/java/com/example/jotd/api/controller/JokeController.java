@@ -3,6 +3,7 @@ package com.example.jotd.api.controller;
 import com.example.jotd.api.errors.JokeNotFound;
 import com.example.jotd.api.errors.JokeTimeInvalid;
 import com.example.jotd.api.model.Joke;
+import com.example.jotd.api.model.JokeResponse;
 import com.example.jotd.domain.service.JokeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,7 +43,7 @@ public class JokeController {
     @ApiResponses({
         @ApiResponse(responseCode = "200", description = "Successfully retrieved the joke of the day")
     })
-    public ResponseEntity<Joke> getJokeOfTheDay() {
+    public ResponseEntity<JokeResponse> getJokeOfTheDay() {
         return ResponseEntity.ok(jokeService.getJokeOfTheDay());
     }
 
@@ -53,7 +55,7 @@ public class JokeController {
         @ApiResponse(responseCode = "400", description = "Invalid joke data", 
                     content = @Content(schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<Joke> createJoke(
+    public ResponseEntity<JokeResponse> createJoke(
             @Parameter(description = "Joke object to be created", required = true)
             @Valid @RequestBody Joke joke) {
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -69,16 +71,14 @@ public class JokeController {
         @ApiResponse(responseCode = "404", description = "Joke not found", 
                     content = @Content(schema = @Schema(implementation = ApiError.class)))
     })
-    public ResponseEntity<Joke> updateJoke(
+    public ResponseEntity<JokeResponse> updateJoke(
             @Parameter(description = "ID of the joke to update", required = true)
             @PathVariable @NotBlank String id,
             @Parameter(description = "Updated joke data", required = true)
             @Valid @RequestBody Joke joke) {
-        Optional<Joke> updatedJoke = jokeService.updateJoke(id, joke);
-        if (updatedJoke.isEmpty()) {
-            throw new JokeNotFound(id);
-        }
-        return ResponseEntity.ok(updatedJoke.get());
+        JokeResponse updatedJoke = jokeService.updateJoke(id, joke);
+
+        return ResponseEntity.ok(updatedJoke);
     }
 
     @DeleteMapping("/{id}")
@@ -101,8 +101,26 @@ public class JokeController {
      */
     @ExceptionHandler(JokeTimeInvalid.class)
     public ResponseEntity<ApiError> handleInvalidJokeTime(JokeTimeInvalid ex, HttpServletRequest request) {
-        ApiError error = ApiError.fromException(HttpStatus.BAD_REQUEST, ex, request.getRequestURI());
+        ApiError error = ApiError.fromException(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Exception handler for DateTimeParseException.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleDateTimeParseException(HttpMessageNotReadableException ex, HttpServletRequest request) {
+        ApiError error = ApiError.fromException(HttpStatus.BAD_REQUEST, "Unable to parse request", request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Exception handler for JokeNotFoundException.
+     */
+    @ExceptionHandler(JokeNotFound.class)
+    public ResponseEntity<ApiError> handleJokeNotFound(JokeNotFound ex, HttpServletRequest request) {
+        ApiError error = ApiError.fromException(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
     /**
@@ -113,7 +131,7 @@ public class JokeController {
         log.error("Unhandled exception", ex);
         ApiError error = ApiError.fromException(
                 HttpStatus.INTERNAL_SERVER_ERROR, 
-                ex, 
+                "Unable to handle request",
                 request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
     }

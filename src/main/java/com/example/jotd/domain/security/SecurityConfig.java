@@ -1,5 +1,6 @@
-package com.example.jotd.config;
+package com.example.jotd.domain.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -25,28 +27,32 @@ import java.util.List;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+    @Autowired
+    private ApiKeyAuthenticationManager apiKeyAuthenticationManager;
+
+    @Bean
+    public ApiAuthenticationConverter apiAuthenticationConverter() {
+        return new ApiAuthenticationConverter();
+    }
+
+    @Bean
+    public ApiKeyFilter apiKeyFilter() {
+        return new ApiKeyFilter(apiAuthenticationConverter(), apiKeyAuthenticationManager);
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Configure CORS
             .cors(Customizer.withDefaults())
-            // Disable CSRF for REST API (consider enabling with proper configuration in production)
             .csrf(AbstractHttpConfigurer::disable)
-            // Configure session management to be stateless for REST
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Configure authorization rules
             .authorizeHttpRequests(authorize -> authorize
-                // Swagger/OpenAPI endpoints
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html", "/actuator*").permitAll()
-                // Public joke endpoints (read-only)
-                .requestMatchers(HttpMethod.GET, "/api/jokes/daily", "/api/jokes/random").permitAll()
-                // All other API endpoints require authentication
-                .requestMatchers("/api/**").authenticated()
-                // Any other request requires authentication
+                .requestMatchers(HttpMethod.GET, "/v1/jokes/daily").permitAll()
+                .requestMatchers("/v1/**").authenticated()
                 .anyRequest().authenticated()
             )
-            // Configure HTTP Basic Authentication
-            .httpBasic(Customizer.withDefaults());
+            .addFilterBefore(apiKeyFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -64,7 +70,7 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

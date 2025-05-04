@@ -1,6 +1,7 @@
 package com.example.jotd.domain.service;
 
 import com.example.jotd.api.model.Joke;
+import com.example.jotd.api.model.JokeResponse;
 
 import java.util.Optional;
 
@@ -8,19 +9,11 @@ import java.util.Optional;
  * Service interface for managing jokes.
  */
 public interface JokeService {
-
-    /**
-     * Find a joke by a given id
-     * @param jokeId the id of the joke to find
-     * @return An optional of a Joke
-     */
-    Optional<Joke> findById(String jokeId);
-
     /**
      * Return the joke of the day
      * This returns the cached value that resets at midnight UTC
      */
-    Joke getJokeOfTheDay();
+    JokeResponse getJokeOfTheDay();
 
     /**
      * Update a joke
@@ -28,7 +21,7 @@ public interface JokeService {
      * @param jokeId the id of the joke to update
      * @return the updated joke
      */
-    Optional<Joke> updateJoke(String jokeId, Joke joke);
+    JokeResponse updateJoke(String jokeId, Joke joke);
 
     /**
      * Save a new joke or update an existing one.
@@ -36,7 +29,7 @@ public interface JokeService {
      * @param joke the joke to save or update
      * @return the saved or updated joke
      */
-    Joke saveJoke(Joke joke);
+    JokeResponse saveJoke(Joke joke);
     
     /**
      * Delete a joke by its ID.

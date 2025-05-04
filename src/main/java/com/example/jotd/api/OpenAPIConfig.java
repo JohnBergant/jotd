@@ -1,4 +1,4 @@
-package com.example.jotd.config;
+package com.example.jotd.api;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -28,7 +28,7 @@ public class OpenAPIConfig {
      */
     @Bean
     public OpenAPI openAPI() {
-        final String securitySchemeName = "basicAuth";
+        final String securitySchemeName = "apikey";
         
         return new OpenAPI()
                 .info(apiInfo())
@@ -36,9 +36,10 @@ public class OpenAPIConfig {
                 .components(new Components()
                         .addSecuritySchemes(securitySchemeName, new SecurityScheme()
                                 .name(securitySchemeName)
-                                .type(SecurityScheme.Type.HTTP)
-                                .scheme("basic")
-                                .description("Basic authentication with username and password")))
+                                .type(SecurityScheme.Type.APIKEY)
+                                .in(SecurityScheme.In.HEADER)
+                                .name("X-API-KEY")
+                                .description("API Key passed in a header")))
                 .addSecurityItem(new SecurityRequirement().addList(securitySchemeName));
     }
 

@@ -1,6 +1,7 @@
-package com.example.jotd.domain.service.transformer;
+package com.example.jotd.domain.transformer;
 
 import com.example.jotd.api.model.Joke;
+import com.example.jotd.api.model.JokeResponse;
 import com.example.jotd.infrastructure.repository.model.JokeDocument;
 import org.springframework.stereotype.Service;
 
@@ -9,9 +10,9 @@ import java.time.LocalDateTime;
 @Service
 public class JokeTransformer {
 
-    public Joke of(JokeDocument jokeDocument) {
-        Joke joke = new Joke();
-        joke.setDate(jokeDocument.getCreatedAt());
+    public JokeResponse of(JokeDocument jokeDocument) {
+        JokeResponse joke = new JokeResponse();
+        joke.setJokeId(jokeDocument.getId());
         joke.setJoke(jokeDocument.getContent());
         joke.setDescription(jokeDocument.getDescription());
 
